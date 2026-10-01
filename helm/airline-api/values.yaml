@@ -1,0 +1,50 @@
+replicaCount: 2
+
+image:
+  repository: REPLACE_ME
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: airline-api
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+env:
+  APP_NAME: airline-booking-api
+  APP_MODE: normal
+
+secretName: airline-database
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+ingress:
+  enabled: true
+  className: alb
+  scheme: internet-facing
+  targetType: ip
+  healthcheckPath: /ready
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
